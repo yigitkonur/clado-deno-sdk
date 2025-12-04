@@ -3,7 +3,7 @@
  * Tests complete workflow: search -> enrich -> get contact.
  */
 
-import { CladoClient, CladoError, CladoRateLimitError } from "jsr:@yigitkonur/clado-sdk@0.1.0";
+import { CladoClient, CladoError, CladoRateLimitError } from "jsr:@yigitkonur/clado-sdk@0.1.1";
 
 const client = new CladoClient({
   apiKey: Deno.env.get("DENO_SDK_TEST_CLADO_API_KEY")!,
@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
           total_found: searchResult.total,
           returned: searchResult.results.length,
           search_id: searchResult.search_id,
-          first_profile: searchResult.results[0]?.profile.name,
+          first_profile: searchResult.results.find((r) => r.profile)?.profile.name,
         },
       };
     } catch (error) {
@@ -104,8 +104,8 @@ Deno.serve(async (req) => {
 
     // Test 4: Get first profile's contact info (if search returned results)
     if (searchResult && searchResult.results.length > 0) {
-      const firstProfile = searchResult.results[0];
-      const linkedinUrl = firstProfile?.profile.linkedin_url;
+      const firstProfile = searchResult.results.find((r) => r.profile);
+      const linkedinUrl = firstProfile?.profile?.linkedin_url;
 
       if (linkedinUrl) {
         console.log("Test 4: Getting contact info...");

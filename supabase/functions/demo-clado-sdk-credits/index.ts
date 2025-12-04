@@ -3,7 +3,7 @@
  * Tests credit balance and rate limit info.
  */
 
-import { CladoClient, CladoError } from "jsr:@yigitkonur/clado-sdk@0.1.0";
+import { CladoClient, CladoError } from "jsr:@yigitkonur/clado-sdk@0.1.1";
 
 const client = new CladoClient({
   apiKey: Deno.env.get("DENO_SDK_TEST_CLADO_API_KEY")!,

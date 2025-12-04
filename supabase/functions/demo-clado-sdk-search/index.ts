@@ -3,7 +3,7 @@
  * Tests basic search functionality with various filters.
  */
 
-import { CladoClient, CladoError } from "jsr:@yigitkonur/clado-sdk@0.1.0";
+import { CladoClient, CladoError } from "jsr:@yigitkonur/clado-sdk@0.1.1";
 
 const client = new CladoClient({
   apiKey: Deno.env.get("DENO_SDK_TEST_CLADO_API_KEY")!,
@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
       total: results.total,
       returned: results.results.length,
       search_id: results.search_id,
-      profiles: results.results.map((r) => ({
+      profiles: results.results.filter((r) => r.profile).map((r) => ({
         id: r.profile.id,
         name: r.profile.name,
         headline: r.profile.headline,

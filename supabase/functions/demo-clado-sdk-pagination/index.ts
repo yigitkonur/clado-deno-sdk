@@ -3,7 +3,7 @@
  * Tests pagination with search_id and async iterator.
  */
 
-import { CladoClient, CladoError } from "jsr:@yigitkonur/clado-sdk@0.1.0";
+import { CladoClient, CladoError } from "jsr:@yigitkonur/clado-sdk@0.1.1";
 
 const client = new CladoClient({
   apiKey: Deno.env.get("DENO_SDK_TEST_CLADO_API_KEY")!,
@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
             total: results.total,
             search_id: results.search_id,
             has_more: offset + results.results.length < results.total,
-            profiles: results.results.map((r) => ({
+            profiles: results.results.filter((r) => r.profile).map((r) => ({
               name: r.profile.name,
               headline: r.profile.headline,
             })),
@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
       search_id: page1.search_id,
       has_more: page1.results.length < page1.total,
       next_offset: limit,
-      profiles: page1.results.map((r) => ({
+      profiles: page1.results.filter((r) => r.profile).map((r) => ({
         name: r.profile.name,
         headline: r.profile.headline,
       })),
