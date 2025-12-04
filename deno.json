@@ -4,6 +4,17 @@
   "exports": "./mod.ts",
   "description": "Deno SDK for Clado LinkedIn Search & Enrichment API - search profiles, enrich contacts, and perform deep research",
   "license": "MIT",
+  "publish": {
+    "include": [
+      "mod.ts",
+      "client.ts",
+      "types.ts",
+      "errors.ts",
+      "utils.ts",
+      "README.md",
+      "LICENSE"
+    ]
+  },
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
