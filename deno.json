@@ -1,0 +1,33 @@
+{
+  "name": "@clado/deno-sdk",
+  "version": "0.1.0",
+  "exports": "./mod.ts",
+  "description": "Deno SDK for Clado LinkedIn Search & Enrichment API - search profiles, enrich contacts, and perform deep research",
+  "license": "MIT",
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "tasks": {
+    "check": "deno check mod.ts",
+    "test": "deno test --allow-env --allow-net tests/",
+    "test:unit": "deno test --allow-env tests/",
+    "fmt": "deno fmt",
+    "fmt:check": "deno fmt --check",
+    "lint": "deno lint",
+    "doc": "deno doc mod.ts",
+    "all": "deno task fmt && deno task lint && deno task check && deno task test"
+  },
+  "fmt": {
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "singleQuote": false
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  }
+}
