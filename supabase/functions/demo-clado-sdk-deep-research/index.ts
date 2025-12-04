@@ -34,18 +34,22 @@ Deno.serve(async (req) => {
         const job = await client.initiateDeepResearch({ query, limit });
 
         return new Response(
-          JSON.stringify({
-            success: true,
-            action: "started",
-            job_id: job.job_id,
-            status: job.status,
-            message: job.message,
-            next_steps: {
-              check_status: `?action=status&job_id=${job.job_id}`,
-              cancel: `?action=cancel&job_id=${job.job_id}`,
-              wait: `?action=wait&job_id=${job.job_id}`,
+          JSON.stringify(
+            {
+              success: true,
+              action: "started",
+              job_id: job.job_id,
+              status: job.status,
+              message: job.message,
+              next_steps: {
+                check_status: `?action=status&job_id=${job.job_id}`,
+                cancel: `?action=cancel&job_id=${job.job_id}`,
+                wait: `?action=wait&job_id=${job.job_id}`,
+              },
             },
-          }, null, 2),
+            null,
+            2,
+          ),
           { headers: corsHeaders },
         );
       }
@@ -98,12 +102,16 @@ Deno.serve(async (req) => {
         const result = await client.cancelDeepResearch(jobId);
 
         return new Response(
-          JSON.stringify({
-            success: result.success,
-            action: "cancelled",
-            job_id: jobId,
-            message: result.message,
-          }, null, 2),
+          JSON.stringify(
+            {
+              success: result.success,
+              action: "cancelled",
+              job_id: jobId,
+              message: result.message,
+            },
+            null,
+            2,
+          ),
           { headers: corsHeaders },
         );
       }
@@ -124,18 +132,22 @@ Deno.serve(async (req) => {
         });
 
         return new Response(
-          JSON.stringify({
-            success: true,
-            action: "completed",
-            job_id: result.job_id,
-            status: result.status,
-            total: result.total,
-            profiles: result.results?.map((r) => ({
-              name: r.profile.name,
-              headline: r.profile.headline,
-              location: r.profile.location,
-            })),
-          }, null, 2),
+          JSON.stringify(
+            {
+              success: true,
+              action: "completed",
+              job_id: result.job_id,
+              status: result.status,
+              total: result.total,
+              profiles: result.results?.map((r) => ({
+                name: r.profile.name,
+                headline: r.profile.headline,
+                location: r.profile.location,
+              })),
+            },
+            null,
+            2,
+          ),
           { headers: corsHeaders },
         );
       }

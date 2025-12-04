@@ -3,7 +3,8 @@
 [![JSR](https://jsr.io/badges/@yigitkonur/clado-sdk)](https://jsr.io/@yigitkonur/clado-sdk)
 [![JSR Score](https://jsr.io/badges/@yigitkonur/clado-sdk/score)](https://jsr.io/@yigitkonur/clado-sdk)
 
-> **Note:** This is an unofficial community SDK for the Clado API. Not affiliated with or endorsed by Clado.
+> **Note:** This is an unofficial community SDK for the Clado API. Not affiliated with or endorsed
+> by Clado.
 
 A TypeScript SDK for the [Clado LinkedIn Search & Enrichment API](https://docs.clado.ai). Optimized
 for Deno and Supabase Edge Functions.
@@ -249,6 +250,31 @@ Set the secret in Supabase:
 supabase secrets set CLADO_API_KEY=lk_xxx
 ```
 
+### Live Demo Functions
+
+This repository includes 6 production-ready Supabase Edge Functions demonstrating all SDK features:
+
+| Function                       | Endpoint                                                                                     | Features Demonstrated                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `demo-clado-sdk-search`        | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-search)        | Search with company/school filters, advanced filtering |
+| `demo-clado-sdk-pagination`    | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-pagination)    | Manual pagination with search_id                       |
+| `demo-clado-sdk-deep-research` | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-deep-research) | Async jobs (start/status/cancel/wait)                  |
+| `demo-clado-sdk-enrich`        | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-enrich)        | Contact info, scraping, post reactions                 |
+| `demo-clado-sdk-credits`       | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-credits)       | Credit balance and rate limits                         |
+| `demo-clado-sdk-full-test`     | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-full-test)     | Complete integration test suite                        |
+
+**Source code:** See `supabase/functions/` directory for implementation details.
+
+**Deploy your own:**
+
+```bash
+# Set your API key as a secret
+supabase secrets set CLADO_API_KEY=your_key_here
+
+# Deploy a function
+supabase functions deploy demo-clado-sdk-search --no-verify-jwt
+```
+
 ## Configuration
 
 ### Environment Variable
@@ -268,6 +294,28 @@ const client = new CladoClient({
   baseUrl: "https://search.clado.ai", // Optional, for custom deployments
 });
 ```
+
+### API Key Formats
+
+The SDK accepts API keys in multiple formats:
+
+- `lk_xxx` - Standard format (as documented)
+- `sk-xxx` - Alternative format (also supported)
+
+Keys are validated by the API server, not the SDK.
+
+### Modern API Format
+
+**Important:** This SDK uses the **modern API format** by default (with 97+ profile fields). The
+legacy format is deprecated as of November 2025.
+
+All search and enrichment methods automatically set `legacy=false` to ensure you receive:
+
+- Complete profile data with 97+ fields
+- Detailed company information (48 fields per job)
+- Structured salary projections
+- Real-time data updates
+- Change tracking for experience updates
 
 ## Pricing
 
@@ -311,6 +359,23 @@ import type {
   SearchResult,
 } from "@yigitkonur/clado-sdk";
 ```
+
+## Examples
+
+The SDK includes comprehensive examples demonstrating all features:
+
+| Example                                                         | Description          | Key Features                                   |
+| --------------------------------------------------------------- | -------------------- | ---------------------------------------------- |
+| [`basic_usage.ts`](examples/basic_usage.ts)                     | Quick start guide    | Simple search, credit check                    |
+| [`pagination.ts`](examples/pagination.ts)                       | Pagination patterns  | Manual pagination, async iterator              |
+| [`deep_research.ts`](examples/deep_research.ts)                 | Async job management | Job polling, cancellation, waitFor helper      |
+| [`advanced_search.ts`](examples/advanced_search.ts)             | Advanced filtering   | Company/school filters, advanced vs standard   |
+| [`profile_enrichment.ts`](examples/profile_enrichment.ts)       | Data enrichment      | Contact info, live scraping, post reactions    |
+| [`error_handling.ts`](examples/error_handling.ts)               | Production patterns  | Retry logic, graceful degradation, error types |
+| [`working_with_profiles.ts`](examples/working_with_profiles.ts) | Data processing      | Rich profile analysis, filtering, aggregation  |
+| [`modern_format_showcase.ts`](examples/modern_format_showcase.ts) | **Modern API format** | Complete showcase of 97+ profile fields |
+
+All examples demonstrate the **modern API format** with 97+ profile fields.
 
 ## Running Examples
 

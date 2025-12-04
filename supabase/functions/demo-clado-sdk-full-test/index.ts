@@ -188,11 +188,15 @@ Deno.serve(async (req) => {
     console.error("Full test error:", error);
 
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: String(error),
-        tests: results.tests,
-      }, null, 2),
+      JSON.stringify(
+        {
+          success: false,
+          error: String(error),
+          tests: results.tests,
+        },
+        null,
+        2,
+      ),
       { status: 500, headers: corsHeaders },
     );
   }

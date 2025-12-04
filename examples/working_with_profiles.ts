@@ -80,9 +80,8 @@ function getHighestDegree(education: Education[] | undefined): Education | undef
       current.degree?.includes(key)
     )?.[1] ?? 0;
 
-    const highestRank = Object.entries(degreeRank).find(([key]) =>
-      highest?.degree?.includes(key)
-    )?.[1] ?? 0;
+    const highestRank =
+      Object.entries(degreeRank).find(([key]) => highest?.degree?.includes(key))?.[1] ?? 0;
 
     return currentRank > highestRank ? current : (highest ?? current);
   }, education[0]);
@@ -138,12 +137,18 @@ function createProfileSummary(result: SearchResult): string {
 ║ COMPANY: ${(currentPos?.company_name ?? "Unknown").padEnd(52)} ║
 ║ LOCATION: ${(profile.location ?? "Unknown").padEnd(51)} ║
 ╠══════════════════════════════════════════════════════════════════╣
-║ EXPERIENCE: ${String(totalYears).padEnd(5)} years across ${String(companies.length).padEnd(3)} companies                  ║
+║ EXPERIENCE: ${String(totalYears).padEnd(5)} years across ${
+    String(companies.length).padEnd(3)
+  } companies                  ║
 ║ EDUCATION: ${(highestDegree?.degree ?? "Unknown").substring(0, 50).padEnd(51)} ║
 ║ SCHOOL: ${(highestDegree?.school_name ?? "Unknown").substring(0, 53).padEnd(54)} ║
 ╠══════════════════════════════════════════════════════════════════╣
-║ CONNECTIONS: ${String(profile.connections_count ?? 0).padEnd(10)} FOLLOWERS: ${String(profile.followers_count ?? 0).padEnd(20)} ║
-║ POSTS: ${String(engagement.totalPosts).padEnd(15)} AVG REACTIONS: ${String(engagement.avgReactions).padEnd(18)} ║
+║ CONNECTIONS: ${String(profile.connections_count ?? 0).padEnd(10)} FOLLOWERS: ${
+    String(profile.followers_count ?? 0).padEnd(20)
+  } ║
+║ POSTS: ${String(engagement.totalPosts).padEnd(15)} AVG REACTIONS: ${
+    String(engagement.avgReactions).padEnd(18)
+  } ║
 ╚══════════════════════════════════════════════════════════════════╝
 `.trim();
 }

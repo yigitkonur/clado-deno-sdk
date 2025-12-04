@@ -50,16 +50,20 @@ Deno.serve(async (req) => {
         });
 
         return new Response(
-          JSON.stringify({
-            success: true,
-            action: "contact",
-            linkedin_url: contact.linkedin_url,
-            email: contact.email,
-            email_status: contact.email_status,
-            phone: contact.phone,
-            phone_status: contact.phone_status,
-            credits_used: contact.credits_used,
-          }, null, 2),
+          JSON.stringify(
+            {
+              success: true,
+              action: "contact",
+              linkedin_url: contact.linkedin_url,
+              email: contact.email,
+              email_status: contact.email_status,
+              phone: contact.phone,
+              phone_status: contact.phone_status,
+              credits_used: contact.credits_used,
+            },
+            null,
+            2,
+          ),
           { headers: corsHeaders },
         );
       }
@@ -87,31 +91,35 @@ Deno.serve(async (req) => {
         });
 
         return new Response(
-          JSON.stringify({
-            success: true,
-            action: "scrape",
-            profile: {
-              id: profile.profile.id,
-              name: profile.profile.name,
-              headline: profile.profile.headline,
-              location: profile.profile.location,
-              connections: profile.profile.connections_count,
-              followers: profile.profile.followers_count,
-              skills: profile.profile.skills?.slice(0, 10),
+          JSON.stringify(
+            {
+              success: true,
+              action: "scrape",
+              profile: {
+                id: profile.profile.id,
+                name: profile.profile.name,
+                headline: profile.profile.headline,
+                location: profile.profile.location,
+                connections: profile.profile.connections_count,
+                followers: profile.profile.followers_count,
+                skills: profile.profile.skills?.slice(0, 10),
+              },
+              experience_count: profile.experience?.length || 0,
+              experience: profile.experience?.slice(0, 3).map((e) => ({
+                title: e.title,
+                company: e.company_name,
+                is_current: e.is_current,
+              })),
+              education_count: profile.education?.length || 0,
+              education: profile.education?.slice(0, 2).map((e) => ({
+                degree: e.degree,
+                school: e.school_name,
+              })),
+              posts_count: profile.posts?.length || 0,
             },
-            experience_count: profile.experience?.length || 0,
-            experience: profile.experience?.slice(0, 3).map((e) => ({
-              title: e.title,
-              company: e.company_name,
-              is_current: e.is_current,
-            })),
-            education_count: profile.education?.length || 0,
-            education: profile.education?.slice(0, 2).map((e) => ({
-              degree: e.degree,
-              school: e.school_name,
-            })),
-            posts_count: profile.posts?.length || 0,
-          }, null, 2),
+            null,
+            2,
+          ),
           { headers: corsHeaders },
         );
       }
@@ -132,16 +140,20 @@ Deno.serve(async (req) => {
         const profile = await client.getLinkedInProfile({ linkedinUrl });
 
         return new Response(
-          JSON.stringify({
-            success: true,
-            action: "database",
-            note: "This is cached data (1 credit vs 2 for live scrape)",
-            profile: {
-              name: profile.profile.name,
-              headline: profile.profile.headline,
-              location: profile.profile.location,
+          JSON.stringify(
+            {
+              success: true,
+              action: "database",
+              note: "This is cached data (1 credit vs 2 for live scrape)",
+              profile: {
+                name: profile.profile.name,
+                headline: profile.profile.headline,
+                location: profile.profile.location,
+              },
             },
-          }, null, 2),
+            null,
+            2,
+          ),
           { headers: corsHeaders },
         );
       }
@@ -167,18 +179,22 @@ Deno.serve(async (req) => {
         });
 
         return new Response(
-          JSON.stringify({
-            success: true,
-            action: "reactions",
-            post_url: reactions.post_url,
-            total_reactions: reactions.total_reactions,
-            returned: reactions.reactions.length,
-            reactions: reactions.reactions.slice(0, 10).map((r) => ({
-              type: r.type,
-              user_name: r.user.name,
-              user_headline: r.user.headline,
-            })),
-          }, null, 2),
+          JSON.stringify(
+            {
+              success: true,
+              action: "reactions",
+              post_url: reactions.post_url,
+              total_reactions: reactions.total_reactions,
+              returned: reactions.reactions.length,
+              reactions: reactions.reactions.slice(0, 10).map((r) => ({
+                type: r.type,
+                user_name: r.user.name,
+                user_headline: r.user.headline,
+              })),
+            },
+            null,
+            2,
+          ),
           { headers: corsHeaders },
         );
       }

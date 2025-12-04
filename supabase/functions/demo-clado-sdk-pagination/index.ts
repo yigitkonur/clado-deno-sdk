@@ -38,19 +38,23 @@ Deno.serve(async (req) => {
       });
 
       return new Response(
-        JSON.stringify({
-          success: true,
-          page: Math.floor(offset / limit) + 1,
-          offset,
-          returned: results.results.length,
-          total: results.total,
-          search_id: results.search_id,
-          has_more: offset + results.results.length < results.total,
-          profiles: results.results.map((r) => ({
-            name: r.profile.name,
-            headline: r.profile.headline,
-          })),
-        }, null, 2),
+        JSON.stringify(
+          {
+            success: true,
+            page: Math.floor(offset / limit) + 1,
+            offset,
+            returned: results.results.length,
+            total: results.total,
+            search_id: results.search_id,
+            has_more: offset + results.results.length < results.total,
+            profiles: results.results.map((r) => ({
+              name: r.profile.name,
+              headline: r.profile.headline,
+            })),
+          },
+          null,
+          2,
+        ),
         { headers: corsHeaders },
       );
     }

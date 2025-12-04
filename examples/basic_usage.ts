@@ -26,6 +26,25 @@ for (const result of results.results) {
   console.log(`  ${result.profile.headline}`);
   console.log(`  ${result.profile.location}`);
   console.log(`  LinkedIn: ${result.profile.linkedin_url}`);
+
+  // Modern format: Show additional rich fields
+  if (result.profile.connections_count) {
+    console.log(`  Connections: ${result.profile.connections_count}`);
+  }
+  if (result.profile.total_experience_duration_months) {
+    const years = Math.floor(result.profile.total_experience_duration_months / 12);
+    console.log(`  Experience: ${years} years`);
+  }
+  if (result.profile.projected_total_salary) {
+    console.log(`  Projected Salary: $${result.profile.projected_total_salary.toLocaleString()}`);
+  }
+
+  // Show current company from experience
+  const currentJob = result.experience?.find((e) => e.is_current);
+  if (currentJob) {
+    console.log(`  Current: ${currentJob.title} at ${currentJob.company_name}`);
+  }
+
   console.log();
 }
 

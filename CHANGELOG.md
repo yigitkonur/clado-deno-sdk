@@ -1,9 +1,24 @@
 # Changelog
 
-All notable changes to the Clado SDK for Deno will be documented in this file.
+All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
-adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.1.1] - 2024-12-04
+
+### Fixed
+- **Modern API format by default**: All search and enrichment methods now automatically use `legacy=false` to ensure modern format with 97+ profile fields
+- **Deep research status types**: Added `"searching"` status to `DeepResearchStatus` type union
+- **Wait logic**: Updated `waitForDeepResearch()` to properly handle `"searching"` status
+
+### Added
+- **Supabase demo functions**: 6 production-ready Edge Functions demonstrating all SDK features
+- **Modern format showcase**: New example (`modern_format_showcase.ts`) highlighting 97+ profile fields
+- **Enhanced examples**: Updated `basic_usage.ts` to show rich modern format fields
+- **Comprehensive README**: Added Supabase demo functions section with live URLs
+- **API key format docs**: Documented support for both `lk_` and `sk-` prefixes
+
+### Changed
+- **Lint configuration**: Excluded `examples/` from no-console rule
+- **Package namespace**: Changed from `@clado/deno-sdk` to `@yigitkonur/clado-sdk` (community package)
 
 ## [0.1.0] - 2024-12-04
 

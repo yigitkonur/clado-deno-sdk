@@ -142,7 +142,10 @@ export class CladoClient {
     const url = buildUrl(
       this.#baseUrl,
       "/api/search",
-      params as Record<string, string | number | boolean | string[] | undefined>,
+      { ...params, legacy: false } as Record<
+        string,
+        string | number | boolean | string[] | undefined
+      >,
     );
     return await request<SearchPeopleResponse>(url, this.#apiKey);
   }
@@ -324,6 +327,16 @@ export class CladoClient {
         throw new CladoError(500, status.error ?? "Deep research job failed");
       }
 
+      // Continue polling for pending, searching, or in_progress
+      if (
+        status.status !== "pending" &&
+        status.status !== "searching" &&
+        status.status !== "in_progress"
+      ) {
+        // Unknown status - return it
+        return status;
+      }
+
       // Check timeout
       if (Date.now() - startTime > timeout) {
         throw new CladoError(
@@ -393,7 +406,10 @@ export class CladoClient {
     const url = buildUrl(
       this.#baseUrl,
       "/api/enrich/linkedin",
-      params as Record<string, string | number | boolean | string[] | undefined>,
+      { ...params, legacy: false } as Record<
+        string,
+        string | number | boolean | string[] | undefined
+      >,
     );
     return await request<LinkedInProfileResponse>(url, this.#apiKey);
   }
@@ -418,6 +434,7 @@ export class CladoClient {
     const params = {
       ...toSnakeCase(options),
       database: true,
+      legacy: false,
     };
     const url = buildUrl(
       this.#baseUrl,

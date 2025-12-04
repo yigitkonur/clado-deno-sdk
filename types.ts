@@ -4,6 +4,9 @@
  * @module
  */
 
+// deno-lint-ignore-file camelcase
+// API response types use snake_case to match the actual API response format
+
 // =============================================================================
 // Profile Types (97+ fields in modern format)
 // =============================================================================
@@ -445,7 +448,7 @@ export interface DeepResearchInitResponse {
 }
 
 /** Deep research job status values */
-export type DeepResearchStatus = "pending" | "in_progress" | "completed" | "failed";
+export type DeepResearchStatus = "pending" | "searching" | "in_progress" | "completed" | "failed";
 
 /** Response from deep research status endpoint */
 export interface DeepResearchStatusResponse {
