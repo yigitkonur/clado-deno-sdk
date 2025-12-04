@@ -47,7 +47,7 @@ export interface CladoClientOptions {
  *
  * @example Basic usage
  * ```ts
- * import { CladoClient } from "@clado/deno-sdk";
+ * import { CladoClient } from "@yigitkonur/clado-sdk";
  *
  * // Uses CLADO_API_KEY environment variable
  * const client = new CladoClient();
@@ -62,7 +62,7 @@ export interface CladoClientOptions {
  *
  * @example Supabase Edge Function
  * ```ts
- * import { CladoClient } from "@clado/deno-sdk";
+ * import { CladoClient } from "@yigitkonur/clado-sdk";
  *
  * const client = new CladoClient();
  *

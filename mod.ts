@@ -14,7 +14,7 @@
  * ## Quick Start
  *
  * ```typescript
- * import { CladoClient } from "@clado/deno-sdk";
+ * import { CladoClient } from "@yigitkonur/clado-sdk";
  *
  * // Uses CLADO_API_KEY env var by default
  * const client = new CladoClient();
@@ -34,7 +34,7 @@
  * ## Supabase Edge Functions
  *
  * ```typescript
- * import { CladoClient } from "@clado/deno-sdk";
+ * import { CladoClient } from "@yigitkonur/clado-sdk";
  *
  * const client = new CladoClient(); // Uses env var
  *

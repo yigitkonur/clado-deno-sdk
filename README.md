@@ -1,7 +1,9 @@
 # Clado SDK for Deno
 
-[![JSR](https://jsr.io/badges/@clado/deno-sdk)](https://jsr.io/@clado/deno-sdk)
-[![JSR Score](https://jsr.io/badges/@clado/deno-sdk/score)](https://jsr.io/@clado/deno-sdk)
+[![JSR](https://jsr.io/badges/@yigitkonur/clado-sdk)](https://jsr.io/@yigitkonur/clado-sdk)
+[![JSR Score](https://jsr.io/badges/@yigitkonur/clado-sdk/score)](https://jsr.io/@yigitkonur/clado-sdk)
+
+> **Note:** This is an unofficial community SDK for the Clado API. Not affiliated with or endorsed by Clado.
 
 A TypeScript SDK for the [Clado LinkedIn Search & Enrichment API](https://docs.clado.ai). Optimized
 for Deno and Supabase Edge Functions.
@@ -21,13 +23,13 @@ for Deno and Supabase Edge Functions.
 ### JSR (Recommended)
 
 ```bash
-deno add @clado/deno-sdk
+deno add @yigitkonur/clado-sdk
 ```
 
 ### Import directly
 
 ```typescript
-import { CladoClient } from "jsr:@clado/deno-sdk";
+import { CladoClient } from "jsr:@yigitkonur/clado-sdk";
 ```
 
 ### deno.land/x
@@ -39,7 +41,7 @@ import { CladoClient } from "https://deno.land/x/clado/mod.ts";
 ## Quick Start
 
 ```typescript
-import { CladoClient } from "@clado/deno-sdk";
+import { CladoClient } from "@yigitkonur/clado-sdk";
 
 // Uses CLADO_API_KEY environment variable by default
 const client = new CladoClient();
@@ -181,7 +183,7 @@ import {
   CladoNotFoundError,
   CladoRateLimitError,
   CladoValidationError,
-} from "@clado/deno-sdk";
+} from "@yigitkonur/clado-sdk";
 
 try {
   await client.searchPeople({ query: "test" });
@@ -212,7 +214,7 @@ The SDK is optimized for Supabase Edge Functions:
 
 ```typescript
 // functions/search/index.ts
-import { CladoClient, CladoError } from "jsr:@clado/deno-sdk";
+import { CladoClient, CladoError } from "jsr:@yigitkonur/clado-sdk";
 
 // Initialize outside handler for reuse
 const client = new CladoClient(); // Uses CLADO_API_KEY env var
@@ -307,7 +309,7 @@ import type {
   SearchPeopleOptions,
   SearchPeopleResponse,
   SearchResult,
-} from "@clado/deno-sdk";
+} from "@yigitkonur/clado-sdk";
 ```
 
 ## Running Examples

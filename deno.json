@@ -1,5 +1,5 @@
 {
-  "name": "@clado/deno-sdk",
+  "name": "@yigitkonur/clado-sdk",
   "version": "0.1.0",
   "exports": "./mod.ts",
   "description": "Deno SDK for Clado LinkedIn Search & Enrichment API - search profiles, enrich contacts, and perform deep research",
