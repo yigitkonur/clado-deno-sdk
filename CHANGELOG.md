@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.0] - 2025-12-06
+
+### Changed
+- **BREAKING**: `scrapeLinkedInProfile()` now uses `/api/enrich/scrape` endpoint instead of `/api/enrich/linkedin`
+- This change enables **posts to be returned** when `includePosts: true` is set
+- Response format remains `LinkedInProfileResponse` (backward compatible)
+
+### Added
+- `ScrapeRawResponse` type for internal scrape endpoint response
+- `ScrapeRawProfileData` type for raw profile data
+- `transformScrapeResponse()` utility function to normalize responses
+
+### Fixed
+- Posts were never returned despite `includePosts: true` - now properly returns up to 50 posts
+
 All notable changes to this project will be documented in this file.
 
 ## [0.1.1] - 2024-12-04

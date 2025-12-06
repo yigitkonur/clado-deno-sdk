@@ -16,13 +16,21 @@ import type {
   PostReactionsOptions,
   PostReactionsResponse,
   ScrapeLinkedInOptions,
+  ScrapeRawResponse,
   SearchPeopleOptions,
   SearchPeopleResponse,
   SearchResult,
   WaitForDeepResearchOptions,
 } from "./types.ts";
 
-import { buildUrl, DEFAULT_BASE_URL, request, sleep, toSnakeCase } from "./utils.ts";
+import {
+  buildUrl,
+  DEFAULT_BASE_URL,
+  request,
+  sleep,
+  toSnakeCase,
+  transformScrapeResponse,
+} from "./utils.ts";
 import { CladoError } from "./errors.ts";
 
 /**
@@ -184,7 +192,10 @@ export class CladoClient {
       }
 
       // Check if we've fetched all results
-      if (response.results.length < limit || offset + response.results.length >= response.total) {
+      if (
+        response.results.length < limit ||
+        offset + response.results.length >= response.total
+      ) {
         break;
       }
 
@@ -261,7 +272,9 @@ export class CladoClient {
       this.#baseUrl,
       `/api/search/deep_research/${jobId}/cancel`,
     );
-    return await request<CancelJobResponse>(url, this.#apiKey, { method: "POST" });
+    return await request<CancelJobResponse>(url, this.#apiKey, {
+      method: "POST",
+    });
   }
 
   /**
@@ -378,7 +391,10 @@ export class CladoClient {
     const url = buildUrl(
       this.#baseUrl,
       "/api/enrich/contact",
-      params as Record<string, string | number | boolean | string[] | undefined>,
+      params as Record<
+        string,
+        string | number | boolean | string[] | undefined
+      >,
     );
     return await request<ContactInfoResponse>(url, this.#apiKey);
   }
@@ -386,6 +402,9 @@ export class CladoClient {
   /**
    * Scrape a LinkedIn profile for detailed data (live scraping).
    * Costs 2 credits per request.
+   *
+   * Uses /api/enrich/scrape endpoint which returns posts when includePosts=true.
+   * Note: Response is transformed from raw format to LinkedInProfileResponse.
    *
    * @param options - Scrape options
    * @returns Full profile with experience, education, and posts
@@ -397,21 +416,29 @@ export class CladoClient {
    *   includePosts: true,
    * });
    * console.log(profile.profile.headline);
+   * console.log(`Posts: ${profile.posts?.length ?? 0}`);
    * ```
    */
   async scrapeLinkedInProfile(
     options: ScrapeLinkedInOptions,
   ): Promise<LinkedInProfileResponse> {
     const params = toSnakeCase(options);
+
+    // Use /api/enrich/scrape endpoint which returns posts
     const url = buildUrl(
       this.#baseUrl,
-      "/api/enrich/linkedin",
-      { ...params, legacy: false } as Record<
+      "/api/enrich/scrape",
+      params as Record<
         string,
         string | number | boolean | string[] | undefined
       >,
     );
-    return await request<LinkedInProfileResponse>(url, this.#apiKey);
+
+    // Raw response from scrape endpoint has different structure
+    const rawResponse = await request<ScrapeRawResponse>(url, this.#apiKey);
+
+    // Transform to LinkedInProfileResponse format
+    return transformScrapeResponse(rawResponse);
   }
 
   /**
@@ -439,7 +466,10 @@ export class CladoClient {
     const url = buildUrl(
       this.#baseUrl,
       "/api/enrich/linkedin",
-      params as Record<string, string | number | boolean | string[] | undefined>,
+      params as Record<
+        string,
+        string | number | boolean | string[] | undefined
+      >,
     );
     return await request<LinkedInProfileResponse>(url, this.#apiKey);
   }
@@ -466,7 +496,10 @@ export class CladoClient {
     const url = buildUrl(
       this.#baseUrl,
       "/api/enrich/reactions",
-      params as Record<string, string | number | boolean | string[] | undefined>,
+      params as Record<
+        string,
+        string | number | boolean | string[] | undefined
+      >,
     );
     return await request<PostReactionsResponse>(url, this.#apiKey);
   }

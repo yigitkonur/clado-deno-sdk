@@ -85,7 +85,8 @@ export interface Profile {
 
   // Experience Breakdowns
   total_experience_duration_months_breakdown_department?: DepartmentBreakdown[];
-  total_experience_duration_months_breakdown_management_level?: ManagementBreakdown[];
+  total_experience_duration_months_breakdown_management_level?:
+    ManagementBreakdown[];
 
   // Active Experience Details (5 fields)
   active_experience_company_id?: number | null;
@@ -448,7 +449,12 @@ export interface DeepResearchInitResponse {
 }
 
 /** Deep research job status values */
-export type DeepResearchStatus = "pending" | "searching" | "in_progress" | "completed" | "failed";
+export type DeepResearchStatus =
+  | "pending"
+  | "searching"
+  | "in_progress"
+  | "completed"
+  | "failed";
 
 /** Response from deep research status endpoint */
 export interface DeepResearchStatusResponse {
@@ -538,8 +544,90 @@ export interface GetLinkedInOptions {
   linkedinUrl: string;
 }
 
+// =============================================================================
+// Raw Scrape Response Types (internal)
+// =============================================================================
+
+/** Raw profile data from /api/enrich/scrape endpoint */
+export interface ScrapeRawProfileData {
+  // Basic Identity
+  id?: string;
+  firstName?: string;
+  lastName?: string;
+  headline?: string;
+  summary?: string;
+
+  // Location
+  geo?: {
+    country?: string;
+    city?: string;
+    full?: string;
+    countryCode?: string;
+  };
+
+  // Profile images
+  profilePicture?: string;
+  profilePictures?: Array<{ url: string; width?: number; height?: number }>;
+  backgroundImage?: string;
+
+  // Engagement
+  isPremium?: boolean;
+  isCreator?: boolean;
+
+  // Experience & Education (raw format)
+  fullPositions?: Array<{
+    title?: string;
+    companyName?: string;
+    companyLogo?: string;
+    companyUrl?: string;
+    location?: string;
+    description?: string;
+    startEndDate?: {
+      start?: { year?: number; month?: number };
+      end?: { year?: number; month?: number };
+    };
+    isCurrent?: boolean;
+  }>;
+
+  educations?: Array<{
+    schoolName?: string;
+    schoolLogo?: string;
+    schoolUrl?: string;
+    degree?: string;
+    fieldOfStudy?: string;
+    startEndDate?: {
+      start?: { year?: number; month?: number };
+      end?: { year?: number; month?: number };
+    };
+    description?: string;
+  }>;
+
+  // Skills
+  skills?: string[];
+
+  // Other
+  linkedinUrl?: string;
+  publicIdentifier?: string;
+}
+
+/** Raw response from /api/enrich/scrape endpoint */
+export interface ScrapeRawResponse {
+  data?: {
+    data?: ScrapeRawProfileData;
+    posts?: Post[];
+    connection?: number;
+    follower?: number;
+  };
+}
+
 /** Reaction types on LinkedIn posts */
-export type ReactionType = "all" | "like" | "appreciation" | "empathy" | "interest" | "praise";
+export type ReactionType =
+  | "all"
+  | "like"
+  | "appreciation"
+  | "empathy"
+  | "interest"
+  | "praise";
 
 /** Options for getting post reactions */
 export interface PostReactionsOptions {

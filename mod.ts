@@ -94,6 +94,8 @@ export type {
   ReactionType,
   ReactionUser,
   ScrapeLinkedInOptions,
+  ScrapeRawProfileData,
+  ScrapeRawResponse,
   // Search types
   SearchPeopleOptions,
   SearchPeopleResponse,

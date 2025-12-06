@@ -11,6 +11,14 @@ import {
   CladoValidationError,
 } from "./errors.ts";
 
+import type {
+  Education,
+  Experience,
+  LinkedInProfileResponse,
+  Profile,
+  ScrapeRawResponse,
+} from "./types.ts";
+
 /** Default base URL for Clado API */
 export const DEFAULT_BASE_URL = "https://search.clado.ai";
 
@@ -249,11 +257,126 @@ export async function request<T>(
 
       throw new CladoError(
         0,
-        `Network error: ${error instanceof Error ? error.message : String(error)}`,
+        `Network error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
       );
     }
   }
 
   // Should not reach here, but just in case
   throw lastError || new CladoError(0, "Request failed after retries");
+}
+
+/**
+ * Transform raw scrape response to LinkedInProfileResponse format.
+ * The /api/enrich/scrape endpoint returns a different structure than /api/enrich/linkedin.
+ *
+ * @param raw - Raw response from /api/enrich/scrape
+ * @returns Normalized LinkedInProfileResponse
+ */
+export function transformScrapeResponse(
+  raw: ScrapeRawResponse,
+): LinkedInProfileResponse {
+  const apiData = raw.data;
+  const profileData = apiData?.data;
+  const posts = apiData?.posts || [];
+
+  // Build profile from raw data
+  const profile: Profile = {
+    id: profileData?.id || "",
+    name: [profileData?.firstName, profileData?.lastName].filter(Boolean).join(
+      " ",
+    ),
+    full_name: [profileData?.firstName, profileData?.lastName].filter(Boolean)
+      .join(" "),
+    first_name: profileData?.firstName,
+    last_name: profileData?.lastName,
+    headline: profileData?.headline,
+    summary: profileData?.summary,
+    description: profileData?.summary,
+
+    // Location
+    location: profileData?.geo?.full,
+    location_full: profileData?.geo?.full,
+    location_country: profileData?.geo?.country,
+    location_city: profileData?.geo?.city,
+    location_country_iso2: profileData?.geo?.countryCode,
+
+    // Profile picture
+    picture_url: profileData?.profilePicture ||
+      profileData?.profilePictures?.[0]?.url,
+    picture_permalink: profileData?.profilePicture,
+
+    // LinkedIn URL
+    linkedin_url: profileData?.linkedinUrl,
+    linkedin_shorthand_names: profileData?.publicIdentifier
+      ? [profileData.publicIdentifier]
+      : undefined,
+
+    // Engagement
+    connections_count: apiData?.connection,
+    followers_count: apiData?.follower,
+
+    // Skills
+    skills: profileData?.skills,
+  };
+
+  // Transform experience
+  const experience: Experience[] = (profileData?.fullPositions || []).map((
+    pos,
+  ) => ({
+    title: pos.title,
+    company_name: pos.companyName,
+    company_logo_url: pos.companyLogo,
+    company_linkedin_url: pos.companyUrl,
+    location: pos.location,
+    description: pos.description,
+    is_current: pos.isCurrent,
+    start_date: pos.startEndDate?.start
+      ? `${pos.startEndDate.start.year || ""}-${
+        String(pos.startEndDate.start.month || 1).padStart(2, "0")
+      }`
+      : undefined,
+    end_date: pos.startEndDate?.end
+      ? `${pos.startEndDate.end.year || ""}-${
+        String(pos.startEndDate.end.month || 1).padStart(2, "0")
+      }`
+      : undefined,
+    date_from_year: pos.startEndDate?.start?.year,
+    date_from_month: pos.startEndDate?.start?.month,
+    date_to_year: pos.startEndDate?.end?.year,
+    date_to_month: pos.startEndDate?.end?.month,
+  }));
+
+  // Transform education
+  const education: Education[] = (profileData?.educations || []).map((edu) => ({
+    school_name: edu.schoolName,
+    school_logo_url: edu.schoolLogo,
+    school_linkedin_url: edu.schoolUrl,
+    degree: edu.degree,
+    field_of_study: edu.fieldOfStudy,
+    description: edu.description,
+    start_date: edu.startEndDate?.start
+      ? `${edu.startEndDate.start.year || ""}-${
+        String(edu.startEndDate.start.month || 1).padStart(2, "0")
+      }`
+      : undefined,
+    end_date: edu.startEndDate?.end
+      ? `${edu.startEndDate.end.year || ""}-${
+        String(edu.startEndDate.end.month || 1).padStart(2, "0")
+      }`
+      : undefined,
+    date_from_year: edu.startEndDate?.start?.year,
+    date_from_month: edu.startEndDate?.start?.month,
+    date_to_year: edu.startEndDate?.end?.year,
+    date_to_month: edu.startEndDate?.end?.month,
+  }));
+
+  return {
+    profile,
+    experience,
+    education,
+    posts,
+  };
 }
