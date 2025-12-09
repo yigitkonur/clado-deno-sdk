@@ -424,21 +424,33 @@ export class CladoClient {
   ): Promise<LinkedInProfileResponse> {
     const params = toSnakeCase(options);
 
-    // Use /api/enrich/scrape endpoint which returns posts
+    // Use /api/enrich/scrape when posts are requested (fresh scrape with posts)
+    // Use /api/enrich/linkedin for fast enrichment (no posts)
+    if (options.includePosts) {
+      const url = buildUrl(
+        this.#baseUrl,
+        "/api/enrich/scrape",
+        params as Record<
+          string,
+          string | number | boolean | string[] | undefined
+        >,
+      );
+      // Raw response from scrape endpoint has different structure
+      const rawResponse = await request<ScrapeRawResponse>(url, this.#apiKey);
+      // Transform to LinkedInProfileResponse format
+      return transformScrapeResponse(rawResponse);
+    }
+
+    // Fast enrichment endpoint - returns LinkedInProfileResponse directly
     const url = buildUrl(
       this.#baseUrl,
-      "/api/enrich/scrape",
-      params as Record<
+      "/api/enrich/linkedin",
+      { ...params, legacy: false } as Record<
         string,
         string | number | boolean | string[] | undefined
       >,
     );
-
-    // Raw response from scrape endpoint has different structure
-    const rawResponse = await request<ScrapeRawResponse>(url, this.#apiKey);
-
-    // Transform to LinkedInProfileResponse format
-    return transformScrapeResponse(rawResponse);
+    return await request<LinkedInProfileResponse>(url, this.#apiKey);
   }
 
   /**
