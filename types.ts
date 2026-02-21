@@ -85,8 +85,7 @@ export interface Profile {
 
   // Experience Breakdowns
   total_experience_duration_months_breakdown_department?: DepartmentBreakdown[];
-  total_experience_duration_months_breakdown_management_level?:
-    ManagementBreakdown[];
+  total_experience_duration_months_breakdown_management_level?: ManagementBreakdown[];
 
   // Active Experience Details (5 fields)
   active_experience_company_id?: number | null;

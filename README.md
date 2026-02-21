@@ -1,4 +1,6 @@
-typed Deno client for the Clado LinkedIn search & enrichment API. search profiles with natural language, run async deep research jobs across large result sets, enrich profiles with live-scraped data and contact info. zero dependencies — just `fetch()` and `Deno.*` built-ins.
+typed Deno client for the Clado LinkedIn search & enrichment API. search profiles with natural
+language, run async deep research jobs across large result sets, enrich profiles with live-scraped
+data and contact info. zero dependencies — just `fetch()` and `Deno.*` built-ins.
 
 ```typescript
 import { CladoClient } from "@yigitkonur/sdk-deno-clado";
@@ -150,10 +152,10 @@ typed error classes with automatic retry built in:
 
 ```typescript
 import {
-  CladoError,
   CladoAuthError,
-  CladoRateLimitError,
+  CladoError,
   CladoNotFoundError,
+  CladoRateLimitError,
   CladoValidationError,
 } from "@yigitkonur/sdk-deno-clado";
 
@@ -172,21 +174,22 @@ try {
 }
 ```
 
-the HTTP layer retries 429s (respects `Retry-After` header) and 5xx errors with exponential backoff + jitter. 401, 404, 422 fail immediately.
+the HTTP layer retries 429s (respects `Retry-After` header) and 5xx errors with exponential
+backoff + jitter. 401, 404, 422 fail immediately.
 
 ## credit costs
 
-| operation | cost |
-|:---|:---|
-| search (advanced filtering) | 1 credit/result |
-| search (standard) | 5 credits flat |
-| live profile scrape | 2 credits |
-| database profile lookup | 1 credit |
-| contact — email | 4 credits |
-| contact — phone | 10 credits |
-| contact — both | 14 credits |
-| post reactions | 1 credit |
-| credits check / deep research status / cancel | free |
+| operation                                     | cost            |
+| :-------------------------------------------- | :-------------- |
+| search (advanced filtering)                   | 1 credit/result |
+| search (standard)                             | 5 credits flat  |
+| live profile scrape                           | 2 credits       |
+| database profile lookup                       | 1 credit        |
+| contact — email                               | 4 credits       |
+| contact — phone                               | 10 credits      |
+| contact — both                                | 14 credits      |
+| post reactions                                | 1 credit        |
+| credits check / deep research status / cancel | free            |
 
 ## edge functions
 
@@ -205,20 +208,20 @@ Deno.serve(async (req) => {
 
 ## API methods
 
-| method | endpoint | description |
-|:---|:---|:---|
-| `searchPeople()` | `GET /api/search` | search LinkedIn profiles |
-| `searchPeopleAll()` | `GET /api/search` | async generator, auto-paginates |
-| `initiateDeepResearch()` | `POST /api/search/deep_research` | start async research job |
-| `getDeepResearchStatus()` | `GET /api/search/deep_research/{id}` | poll job status |
-| `cancelDeepResearch()` | `POST /api/search/deep_research/{id}/cancel` | cancel running job |
-| `continueDeepResearch()` | `POST /api/search/deep_research/{id}/continue` | extend a job |
-| `waitForDeepResearch()` | polling wrapper | wait for completion with timeout |
-| `scrapeLinkedInProfile()` | `GET /api/enrich/scrape` or `/linkedin` | live profile scrape |
-| `getLinkedInProfile()` | `GET /api/enrich/linkedin` | cached database lookup |
-| `getContactInfo()` | `GET /api/enrich/contact` | email/phone enrichment |
-| `getPostReactions()` | `GET /api/enrich/reactions` | post reaction details |
-| `getCredits()` | `GET /api/credits` | remaining credits and plan info |
+| method                    | endpoint                                       | description                      |
+| :------------------------ | :--------------------------------------------- | :------------------------------- |
+| `searchPeople()`          | `GET /api/search`                              | search LinkedIn profiles         |
+| `searchPeopleAll()`       | `GET /api/search`                              | async generator, auto-paginates  |
+| `initiateDeepResearch()`  | `POST /api/search/deep_research`               | start async research job         |
+| `getDeepResearchStatus()` | `GET /api/search/deep_research/{id}`           | poll job status                  |
+| `cancelDeepResearch()`    | `POST /api/search/deep_research/{id}/cancel`   | cancel running job               |
+| `continueDeepResearch()`  | `POST /api/search/deep_research/{id}/continue` | extend a job                     |
+| `waitForDeepResearch()`   | polling wrapper                                | wait for completion with timeout |
+| `scrapeLinkedInProfile()` | `GET /api/enrich/scrape` or `/linkedin`        | live profile scrape              |
+| `getLinkedInProfile()`    | `GET /api/enrich/linkedin`                     | cached database lookup           |
+| `getContactInfo()`        | `GET /api/enrich/contact`                      | email/phone enrichment           |
+| `getPostReactions()`      | `GET /api/enrich/reactions`                    | post reaction details            |
+| `getCredits()`            | `GET /api/credits`                             | remaining credits and plan info  |
 
 ## development
 

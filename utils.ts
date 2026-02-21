@@ -257,9 +257,7 @@ export async function request<T>(
 
       throw new CladoError(
         0,
-        `Network error: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
+        `Network error: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

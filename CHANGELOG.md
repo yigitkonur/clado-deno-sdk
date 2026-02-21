@@ -3,16 +3,20 @@
 ## [0.2.0] - 2025-12-06
 
 ### Changed
-- **BREAKING**: `scrapeLinkedInProfile()` now uses `/api/enrich/scrape` endpoint instead of `/api/enrich/linkedin`
+
+- **BREAKING**: `scrapeLinkedInProfile()` now uses `/api/enrich/scrape` endpoint instead of
+  `/api/enrich/linkedin`
 - This change enables **posts to be returned** when `includePosts: true` is set
 - Response format remains `LinkedInProfileResponse` (backward compatible)
 
 ### Added
+
 - `ScrapeRawResponse` type for internal scrape endpoint response
 - `ScrapeRawProfileData` type for raw profile data
 - `transformScrapeResponse()` utility function to normalize responses
 
 ### Fixed
+
 - Posts were never returned despite `includePosts: true` - now properly returns up to 50 posts
 
 All notable changes to this project will be documented in this file.
@@ -20,20 +24,26 @@ All notable changes to this project will be documented in this file.
 ## [0.1.1] - 2024-12-04
 
 ### Fixed
-- **Modern API format by default**: All search and enrichment methods now automatically use `legacy=false` to ensure modern format with 97+ profile fields
+
+- **Modern API format by default**: All search and enrichment methods now automatically use
+  `legacy=false` to ensure modern format with 97+ profile fields
 - **Deep research status types**: Added `"searching"` status to `DeepResearchStatus` type union
 - **Wait logic**: Updated `waitForDeepResearch()` to properly handle `"searching"` status
 
 ### Added
+
 - **Supabase demo functions**: 6 production-ready Edge Functions demonstrating all SDK features
-- **Modern format showcase**: New example (`modern_format_showcase.ts`) highlighting 97+ profile fields
+- **Modern format showcase**: New example (`modern_format_showcase.ts`) highlighting 97+ profile
+  fields
 - **Enhanced examples**: Updated `basic_usage.ts` to show rich modern format fields
 - **Comprehensive README**: Added Supabase demo functions section with live URLs
 - **API key format docs**: Documented support for both `lk_` and `sk-` prefixes
 
 ### Changed
+
 - **Lint configuration**: Excluded `examples/` from no-console rule
-- **Package namespace**: Changed from `@clado/deno-sdk` to `@yigitkonur/sdk-deno-clado` (community package)
+- **Package namespace**: Changed from `@clado/deno-sdk` to `@yigitkonur/sdk-deno-clado` (community
+  package)
 
 ## [0.1.0] - 2024-12-04
 
