@@ -1,421 +1,251 @@
-# Clado SDK for Deno
+typed Deno client for the Clado LinkedIn search & enrichment API. search profiles with natural language, run async deep research jobs across large result sets, enrich profiles with live-scraped data and contact info. zero dependencies — just `fetch()` and `Deno.*` built-ins.
 
-[![JSR](https://jsr.io/badges/@yigitkonur/clado-sdk)](https://jsr.io/@yigitkonur/clado-sdk)
-[![JSR Score](https://jsr.io/badges/@yigitkonur/clado-sdk/score)](https://jsr.io/@yigitkonur/clado-sdk)
+```typescript
+import { CladoClient } from "@yigitkonur/clado-sdk";
 
-> **Note:** This is an unofficial community SDK for the Clado API. Not affiliated with or endorsed
-> by Clado.
-
-A TypeScript SDK for the [Clado LinkedIn Search & Enrichment API](https://docs.clado.ai). Optimized
-for Deno and Supabase Edge Functions.
-
-## Features
-
-- 🔍 **Search** - Find LinkedIn profiles using natural language queries
-- 🔬 **Deep Research** - Comprehensive async profile research with polling
-- 📧 **Enrichment** - Get contact info, scrape profiles, analyze post reactions
-- 💳 **Platform** - Check credits and rate limits
-- 🚀 **Edge Ready** - Optimized for Supabase Edge Functions / Deno Deploy
-- 📝 **Fully Typed** - 97+ profile fields with complete TypeScript definitions
-- 🔄 **Auto Retry** - Exponential backoff for rate limits and server errors
-
-## Installation
-
-### JSR (Recommended)
-
-```bash
-deno add @yigitkonur/clado-sdk
+const client = new CladoClient();
+const results = await client.searchPeople({ query: "ML engineers in Berlin", limit: 10 });
 ```
 
-### Import directly
+[![JSR](https://jsr.io/badges/@yigitkonur/clado-sdk)](https://jsr.io/@yigitkonur/clado-sdk)
+[![deno](https://img.shields.io/badge/deno-2.0+-93450a.svg?style=flat-square)](https://deno.land/)
+[![license](https://img.shields.io/badge/license-MIT-grey.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+
+---
+
+## what it does
+
+- **natural language search** — find LinkedIn profiles by description, filter by companies/schools
+- **async deep research** — kick off large-scale search jobs, poll or await completion
+- **profile enrichment** — live scrape or cached lookup, with posts, experience, education
+- **contact info** — email and phone enrichment with verification status
+- **post reactions** — get reaction details on any LinkedIn post
+- **auto-pagination** — async generator that walks through all result pages
+- **retry with backoff** — handles 429s and 5xx automatically, 3 retries with jitter
+
+## install
+
+```bash
+deno add jsr:@yigitkonur/clado-sdk
+```
+
+or import directly:
 
 ```typescript
 import { CladoClient } from "jsr:@yigitkonur/clado-sdk";
 ```
 
-### deno.land/x
+## auth
+
+pass an API key directly or set the `CLADO_API_KEY` env var:
 
 ```typescript
-import { CladoClient } from "https://deno.land/x/clado/mod.ts";
-```
-
-## Quick Start
-
-```typescript
-import { CladoClient } from "@yigitkonur/clado-sdk";
-
-// Uses CLADO_API_KEY environment variable by default
+// from env (reads CLADO_API_KEY)
 const client = new CladoClient();
 
-// Or provide API key explicitly
-const client = new CladoClient({ apiKey: "lk_xxx" });
+// explicit
+const client = new CladoClient({ apiKey: "lk_..." });
+```
 
-// Search for profiles
+## usage
+
+### search
+
+```typescript
 const results = await client.searchPeople({
   query: "software engineers in San Francisco",
-  limit: 10,
+  limit: 30,
+  advancedFiltering: true,
+  companies: ["Google", "Meta"],
 });
 
-console.log(`Found ${results.total} profiles`);
 for (const result of results.results) {
-  console.log(`- ${result.profile.name}: ${result.profile.headline}`);
+  console.log(result.profile.name, result.profile.headline);
 }
 ```
 
-## API Reference
-
-### Search People
-
-Search for LinkedIn profiles using natural language queries.
+### paginate through all results
 
 ```typescript
-const results = await client.searchPeople({
-  query: "ML engineers at startups",
-  limit: 30, // Max 100
-  advancedFiltering: true, // AI-powered filtering (default)
-  companies: ["Google", "Meta"], // Filter by company
-  schools: ["Stanford"], // Filter by school
-});
-
-// Pagination using search_id
-const page2 = await client.searchPeople({
-  searchId: results.search_id,
-  offset: 30,
-});
-```
-
-#### Async Iterator for Large Result Sets
-
-```typescript
-for await (const result of client.searchPeopleAll({ query: "engineers" })) {
+// auto-pagination via async generator
+for await (const result of client.searchPeopleAll({ query: "engineers", limit: 10 })) {
   console.log(result.profile.name);
-  // Automatically handles pagination
 }
+
+// or manually with search_id
+const page1 = await client.searchPeople({ query: "engineers", limit: 30 });
+const page2 = await client.searchPeople({ searchId: page1.search_id, offset: 30, limit: 30 });
 ```
 
-### Deep Research
+### deep research
 
-Initiate comprehensive async research jobs for detailed profile data.
+async job pattern for large result sets:
 
 ```typescript
-// Start a job
 const job = await client.initiateDeepResearch({
-  query: "machine learning engineers",
+  query: "ML engineers at YC startups",
   limit: 50,
 });
 
-// Option 1: Poll manually
+// built-in polling (default: 2s interval, 5min timeout)
+const result = await client.waitForDeepResearch(job.job_id);
+
+// or poll manually
 let status = await client.getDeepResearchStatus(job.job_id);
-while (status.status === "pending" || status.status === "in_progress") {
-  await new Promise((r) => setTimeout(r, 3000));
-  status = await client.getDeepResearchStatus(job.job_id);
-}
 
-// Option 2: Use the helper (recommended)
-const result = await client.waitForDeepResearch(job.job_id, {
-  pollInterval: 2000, // Poll every 2 seconds
-  timeout: 300000, // 5 minute timeout
-});
-
-// Cancel a job
+// cancel if needed
 await client.cancelDeepResearch(job.job_id);
 
-// Continue with more results
+// continue a completed job with new params
 await client.continueDeepResearch(job.job_id, { limit: 100 });
 ```
 
-### Enrichment
-
-Get contact information and detailed profile data.
+### enrich profiles
 
 ```typescript
-// Get contact info (email/phone)
-const contact = await client.getContactInfo({
-  linkedinUrl: "https://linkedin.com/in/johndoe",
-  enrichEmail: true,
-  enrichPhone: true, // Costs 10 credits if found
-});
-
-if (contact.email) {
-  console.log(`Email: ${contact.email} (${contact.email_status})`);
-}
-
-// Scrape profile (live data, 2 credits)
+// live scrape with posts (2 credits)
 const profile = await client.scrapeLinkedInProfile({
   linkedinUrl: "https://linkedin.com/in/johndoe",
   includePosts: true,
-  includeExperience: true,
-  includeEducation: true,
 });
 
-// Get profile from database (cached, 1 credit)
+// cached database lookup (1 credit)
 const cached = await client.getLinkedInProfile({
   linkedinUrl: "https://linkedin.com/in/johndoe",
 });
+```
 
-// Analyze post reactions
+### contact info
+
+```typescript
+const contact = await client.getContactInfo({
+  linkedinUrl: "https://linkedin.com/in/johndoe",
+  enrichEmail: true,
+  enrichPhone: false,
+});
+
+console.log(contact.email, contact.email_status, contact.credits_used);
+```
+
+### post reactions
+
+```typescript
 const reactions = await client.getPostReactions({
   postUrl: "https://linkedin.com/posts/...",
   limit: 100,
-  reactionType: "like", // Filter by type
+  reactionType: "all",
 });
 ```
 
-### Platform
-
-Check your account status.
+### check credits
 
 ```typescript
 const credits = await client.getCredits();
-console.log(`Remaining: ${credits.credits_remaining}`);
-console.log(`Used: ${credits.credits_used}`);
-console.log(`Tier: ${credits.rate_limit_tier}`);
+console.log(credits.remaining, credits.plan, credits.rate_limit_tier);
 ```
 
-## Error Handling
+## error handling
 
-The SDK provides typed error classes for different error conditions:
+typed error classes with automatic retry built in:
 
 ```typescript
 import {
-  CladoAuthError,
-  CladoClient,
   CladoError,
-  CladoNotFoundError,
+  CladoAuthError,
   CladoRateLimitError,
+  CladoNotFoundError,
   CladoValidationError,
 } from "@yigitkonur/clado-sdk";
 
 try {
-  await client.searchPeople({ query: "test" });
+  await client.searchPeople({ query: "engineers" });
 } catch (error) {
   if (error instanceof CladoRateLimitError) {
-    // Rate limited - wait and retry
-    console.log(`Rate limited. Retry after ${error.retryAfter}s`);
-    await new Promise((r) => setTimeout(r, error.retryAfter * 1000));
+    console.log(`retry after ${error.retryAfter}s`);
   } else if (error instanceof CladoAuthError) {
-    // Invalid API key
-    console.log("Invalid API key");
-  } else if (error instanceof CladoNotFoundError) {
-    // Resource not found
-    console.log("Not found");
+    console.error("invalid API key");
   } else if (error instanceof CladoValidationError) {
-    // Invalid request parameters
-    console.log(`Validation error: ${error.message}`);
+    console.error("bad params:", error.message);
   } else if (error instanceof CladoError) {
-    // Other API error
-    console.log(`API error ${error.status}: ${error.message}`);
+    console.error(`API error ${error.status}:`, error.message);
   }
 }
 ```
 
-## Supabase Edge Functions
+the HTTP layer retries 429s (respects `Retry-After` header) and 5xx errors with exponential backoff + jitter. 401, 404, 422 fail immediately.
 
-The SDK is optimized for Supabase Edge Functions:
+## credit costs
 
-```typescript
-// functions/search/index.ts
-import { CladoClient, CladoError } from "jsr:@yigitkonur/clado-sdk";
+| operation | cost |
+|:---|:---|
+| search (advanced filtering) | 1 credit/result |
+| search (standard) | 5 credits flat |
+| live profile scrape | 2 credits |
+| database profile lookup | 1 credit |
+| contact — email | 4 credits |
+| contact — phone | 10 credits |
+| contact — both | 14 credits |
+| post reactions | 1 credit |
+| credits check / deep research status / cancel | free |
 
-// Initialize outside handler for reuse
-const client = new CladoClient(); // Uses CLADO_API_KEY env var
+## edge functions
 
-export default async function handler(req: Request): Promise<Response> {
-  try {
-    const { query, limit = 10 } = await req.json();
-
-    const results = await client.searchPeople({ query, limit });
-
-    return new Response(JSON.stringify(results), {
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    if (error instanceof CladoError) {
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        { status: error.status },
-      );
-    }
-    return new Response(
-      JSON.stringify({ error: "Internal Server Error" }),
-      { status: 500 },
-    );
-  }
-}
-```
-
-Set the secret in Supabase:
-
-```bash
-supabase secrets set CLADO_API_KEY=lk_xxx
-```
-
-### Live Demo Functions
-
-This repository includes 6 production-ready Supabase Edge Functions demonstrating all SDK features:
-
-| Function                       | Endpoint                                                                                     | Features Demonstrated                                  |
-| ------------------------------ | -------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `demo-clado-sdk-search`        | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-search)        | Search with company/school filters, advanced filtering |
-| `demo-clado-sdk-pagination`    | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-pagination)    | Manual pagination with search_id                       |
-| `demo-clado-sdk-deep-research` | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-deep-research) | Async jobs (start/status/cancel/wait)                  |
-| `demo-clado-sdk-enrich`        | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-enrich)        | Contact info, scraping, post reactions                 |
-| `demo-clado-sdk-credits`       | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-credits)       | Credit balance and rate limits                         |
-| `demo-clado-sdk-full-test`     | [Try it](https://dugggxrwvfakrzmnlfif.supabase.co/functions/v1/demo-clado-sdk-full-test)     | Complete integration test suite                        |
-
-**Source code:** See `supabase/functions/` directory for implementation details.
-
-**Deploy your own:**
-
-```bash
-# Set your API key as a secret
-supabase secrets set CLADO_API_KEY=your_key_here
-
-# Deploy a function
-supabase functions deploy demo-clado-sdk-search --no-verify-jwt
-```
-
-## Configuration
-
-### Environment Variable
-
-The SDK reads from `CLADO_API_KEY` by default:
-
-```bash
-export CLADO_API_KEY=lk_xxx
-deno run --allow-env --allow-net your_script.ts
-```
-
-### Explicit Configuration
+works on Supabase Edge Functions and Deno Deploy out of the box:
 
 ```typescript
-const client = new CladoClient({
-  apiKey: "lk_xxx",
-  baseUrl: "https://search.clado.ai", // Optional, for custom deployments
+import { CladoClient } from "jsr:@yigitkonur/clado-sdk";
+
+Deno.serve(async (req) => {
+  const client = new CladoClient({ apiKey: Deno.env.get("CLADO_API_KEY")! });
+  const { query } = await req.json();
+  const results = await client.searchPeople({ query, limit: 10 });
+  return Response.json({ profiles: results.results, total: results.total });
 });
 ```
 
-### API Key Formats
+## API methods
 
-The SDK accepts API keys in multiple formats:
+| method | endpoint | description |
+|:---|:---|:---|
+| `searchPeople()` | `GET /api/search` | search LinkedIn profiles |
+| `searchPeopleAll()` | `GET /api/search` | async generator, auto-paginates |
+| `initiateDeepResearch()` | `POST /api/search/deep_research` | start async research job |
+| `getDeepResearchStatus()` | `GET /api/search/deep_research/{id}` | poll job status |
+| `cancelDeepResearch()` | `POST /api/search/deep_research/{id}/cancel` | cancel running job |
+| `continueDeepResearch()` | `POST /api/search/deep_research/{id}/continue` | extend a job |
+| `waitForDeepResearch()` | polling wrapper | wait for completion with timeout |
+| `scrapeLinkedInProfile()` | `GET /api/enrich/scrape` or `/linkedin` | live profile scrape |
+| `getLinkedInProfile()` | `GET /api/enrich/linkedin` | cached database lookup |
+| `getContactInfo()` | `GET /api/enrich/contact` | email/phone enrichment |
+| `getPostReactions()` | `GET /api/enrich/reactions` | post reaction details |
+| `getCredits()` | `GET /api/credits` | remaining credits and plan info |
 
-- `lk_xxx` - Standard format (as documented)
-- `sk-xxx` - Alternative format (also supported)
-
-Keys are validated by the API server, not the SDK.
-
-### Modern API Format
-
-**Important:** This SDK uses the **modern API format** by default (with 97+ profile fields). The
-legacy format is deprecated as of November 2025.
-
-All search and enrichment methods automatically set `legacy=false` to ensure you receive:
-
-- Complete profile data with 97+ fields
-- Detailed company information (48 fields per job)
-- Structured salary projections
-- Real-time data updates
-- Change tracking for experience updates
-
-## Pricing
-
-| Endpoint                    | Credits      |
-| --------------------------- | ------------ |
-| Search (advanced filtering) | 1 per result |
-| Search (standard)           | 5 flat       |
-| Deep Research               | 1 per result |
-| Contact Info (email)        | 4 if found   |
-| Contact Info (phone)        | 10 if found  |
-| Scrape LinkedIn             | 2            |
-| Get LinkedIn (database)     | 1            |
-| Post Reactions              | 1            |
-| Get Credits                 | Free         |
-
-## Rate Limits
-
-| Tier | Search  | Contact | Scrape  | Deep Research |
-| ---- | ------- | ------- | ------- | ------------- |
-| Free | 20/min  | 0/min   | 15/min  | 5/min         |
-| $50  | 200/min | 60/min  | 150/min | 50/min        |
-| $250 | 400/min | 120/min | 300/min | 100/min       |
-
-## Types
-
-All types are exported for use in your application:
-
-```typescript
-import type {
-  ContactInfoOptions,
-  ContactInfoResponse,
-  CreditsResponse,
-  DeepResearchOptions,
-  DeepResearchStatusResponse,
-  Education,
-  Experience,
-  Post,
-  Profile,
-  SearchPeopleOptions,
-  SearchPeopleResponse,
-  SearchResult,
-} from "@yigitkonur/clado-sdk";
-```
-
-## Examples
-
-The SDK includes comprehensive examples demonstrating all features:
-
-| Example                                                         | Description          | Key Features                                   |
-| --------------------------------------------------------------- | -------------------- | ---------------------------------------------- |
-| [`basic_usage.ts`](examples/basic_usage.ts)                     | Quick start guide    | Simple search, credit check                    |
-| [`pagination.ts`](examples/pagination.ts)                       | Pagination patterns  | Manual pagination, async iterator              |
-| [`deep_research.ts`](examples/deep_research.ts)                 | Async job management | Job polling, cancellation, waitFor helper      |
-| [`advanced_search.ts`](examples/advanced_search.ts)             | Advanced filtering   | Company/school filters, advanced vs standard   |
-| [`profile_enrichment.ts`](examples/profile_enrichment.ts)       | Data enrichment      | Contact info, live scraping, post reactions    |
-| [`error_handling.ts`](examples/error_handling.ts)               | Production patterns  | Retry logic, graceful degradation, error types |
-| [`working_with_profiles.ts`](examples/working_with_profiles.ts) | Data processing      | Rich profile analysis, filtering, aggregation  |
-| [`modern_format_showcase.ts`](examples/modern_format_showcase.ts) | **Modern API format** | Complete showcase of 97+ profile fields |
-
-All examples demonstrate the **modern API format** with 97+ profile fields.
-
-## Running Examples
+## development
 
 ```bash
-# Basic usage
-CLADO_API_KEY=lk_xxx deno run --allow-env --allow-net examples/basic_usage.ts
-
-# Pagination
-CLADO_API_KEY=lk_xxx deno run --allow-env --allow-net examples/pagination.ts
-
-# Deep research
-CLADO_API_KEY=lk_xxx deno run --allow-env --allow-net examples/deep_research.ts
+deno task all        # fmt + lint + check + test
+deno task test       # run tests (needs --allow-env --allow-net)
+deno task test:unit  # unit tests only (no network)
+deno task check      # type check
+deno task fmt        # format
+deno task lint       # lint
 ```
 
-## Development
+## project structure
 
-```bash
-# Type check
-deno task check
-
-# Run tests
-deno task test
-
-# Format code
-deno task fmt
-
-# Lint
-deno task lint
-
-# All checks
-deno task all
+```
+mod.ts        — public entry point, re-exports everything
+client.ts     — CladoClient class (all 12 methods)
+types.ts      — all TypeScript interfaces and type aliases
+errors.ts     — error class hierarchy
+utils.ts      — HTTP transport, URL builder, retry logic
+tests/
+  client_test.ts   — 13 tests
+  errors_test.ts   — 7 tests
+  utils_test.ts    — 9 tests
+examples/          — usage examples and Supabase edge functions
 ```
 
-## License
+## license
 
 MIT
-
-## Links
-
-- [Clado API Documentation](https://docs.clado.ai)
-- [API Pricing](https://docs.clado.ai/api-reference/pricing)
-- [Rate Limits](https://docs.clado.ai/api-reference/rate-limits)
-- [Discord Community](https://discord.gg/EVZu85Pc5t)
