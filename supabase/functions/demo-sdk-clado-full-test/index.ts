@@ -3,7 +3,7 @@
  * Tests complete workflow: search -> enrich -> get contact.
  */
 
-import { CladoClient, CladoError, CladoRateLimitError } from "jsr:@yigitkonur/clado-sdk@0.1.1";
+import { CladoClient, CladoError, CladoRateLimitError } from "jsr:@yigitkonur/sdk-deno-clado@0.1.1";
 
 const client = new CladoClient({
   apiKey: Deno.env.get("DENO_SDK_TEST_CLADO_API_KEY")!,

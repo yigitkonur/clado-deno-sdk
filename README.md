@@ -1,13 +1,13 @@
 typed Deno client for the Clado LinkedIn search & enrichment API. search profiles with natural language, run async deep research jobs across large result sets, enrich profiles with live-scraped data and contact info. zero dependencies — just `fetch()` and `Deno.*` built-ins.
 
 ```typescript
-import { CladoClient } from "@yigitkonur/clado-sdk";
+import { CladoClient } from "@yigitkonur/sdk-deno-clado";
 
 const client = new CladoClient();
 const results = await client.searchPeople({ query: "ML engineers in Berlin", limit: 10 });
 ```
 
-[![JSR](https://jsr.io/badges/@yigitkonur/clado-sdk)](https://jsr.io/@yigitkonur/clado-sdk)
+[![JSR](https://jsr.io/badges/@yigitkonur/sdk-deno-clado)](https://jsr.io/@yigitkonur/sdk-deno-clado)
 [![deno](https://img.shields.io/badge/deno-2.0+-93450a.svg?style=flat-square)](https://deno.land/)
 [![license](https://img.shields.io/badge/license-MIT-grey.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
@@ -26,13 +26,13 @@ const results = await client.searchPeople({ query: "ML engineers in Berlin", lim
 ## install
 
 ```bash
-deno add jsr:@yigitkonur/clado-sdk
+deno add jsr:@yigitkonur/sdk-deno-clado
 ```
 
 or import directly:
 
 ```typescript
-import { CladoClient } from "jsr:@yigitkonur/clado-sdk";
+import { CladoClient } from "jsr:@yigitkonur/sdk-deno-clado";
 ```
 
 ## auth
@@ -155,7 +155,7 @@ import {
   CladoRateLimitError,
   CladoNotFoundError,
   CladoValidationError,
-} from "@yigitkonur/clado-sdk";
+} from "@yigitkonur/sdk-deno-clado";
 
 try {
   await client.searchPeople({ query: "engineers" });
@@ -193,7 +193,7 @@ the HTTP layer retries 429s (respects `Retry-After` header) and 5xx errors with 
 works on Supabase Edge Functions and Deno Deploy out of the box:
 
 ```typescript
-import { CladoClient } from "jsr:@yigitkonur/clado-sdk";
+import { CladoClient } from "jsr:@yigitkonur/sdk-deno-clado";
 
 Deno.serve(async (req) => {
   const client = new CladoClient({ apiKey: Deno.env.get("CLADO_API_KEY")! });

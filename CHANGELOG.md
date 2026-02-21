@@ -33,7 +33,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - **Lint configuration**: Excluded `examples/` from no-console rule
-- **Package namespace**: Changed from `@clado/deno-sdk` to `@yigitkonur/clado-sdk` (community package)
+- **Package namespace**: Changed from `@clado/deno-sdk` to `@yigitkonur/sdk-deno-clado` (community package)
 
 ## [0.1.0] - 2024-12-04
 

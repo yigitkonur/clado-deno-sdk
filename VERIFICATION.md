@@ -178,7 +178,7 @@ Documentation
 ## Files Created
 
 ```
-clado-deno-sdk/
+sdk-deno-clado/
 ├── mod.ts              ✅ Entry point with module doc
 ├── client.ts           ✅ CladoClient with #apiKey, env fallback
 ├── types.ts            ✅ All types (97+ profile fields)
